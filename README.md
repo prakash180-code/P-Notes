@@ -14,6 +14,7 @@ Personal notes application combining Google Keep, desktop sticky notes, floating
 - JSON export/backup with share sheet, plus JSON restore from the same screen
 - Home-screen widget with live refresh and tap-to-open notes
 - Optional Firebase cloud sync (notes + checklists, manual or every 6 hours; requires `google-services.json`)
+- Google Sign-In via Android Credential Manager, with anonymous→Google account linking and conflict handling
 - MVVM architecture
 
 ## Tech Stack

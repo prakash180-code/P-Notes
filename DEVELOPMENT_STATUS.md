@@ -52,16 +52,11 @@
 - [x] Build succeeds and unit tests pass
 
 ### Pending
-- [ ] Add google-services.json from Firebase Console
-- [ ] Uncomment the google-services classpath (build.gradle) and plugin (app/build.gradle)
+- [ ] Enable the Google provider in Firebase Console → Authentication → Sign-in method
+- [ ] Runtime verification of Google Sign-In on a device
 
 ### Notes
-Firebase SDKs compile and run without google-services.json; every Firebase call is wrapped in try/catch and the Settings screen reports that sync is unavailable. To enable cloud sync:
-1. Create a Firebase project at https://console.firebase.google.com
-2. Register an Android app with package com.prakash.pnotes
-3. Download google-services.json and place it at app/google-services.json
-4. Uncomment the google-services classpath and plugin in build.gradle files
-5. Sign in anonymously from Settings and enable sync
+Firebase is configured: `app/google-services.json` is present (project `p-notes-30981`, package `com.prakash.pnotes`), the google-services classpath/plugin are enabled, and the debug SHA-1 is registered. Anonymous Auth must also be enabled in the console for "Continue anonymously". Cloud sync remains optional and is not enforced.
 
 ## Phase 4: Stability fixes (COMPLETE)
 
@@ -78,3 +73,20 @@ Firebase SDKs compile and run without google-services.json; every Firebase call 
 - [x] JSON backup can be restored from the Export screen (newer backup copy wins)
 - [x] Restoring a backup also restores checklist items
 - [x] Instrumented tests cover the export/import round-trip and the newer-local-wins rule
+
+## Phase 5: Google Sign-In (IMPLEMENTED, pending device verification)
+
+### Completed
+- [x] Firebase configured: google-services.json present, google-services plugin enabled, debug SHA-1 registered
+- [x] Credential Manager (`androidx.credentials:credentials:1.3.0`, `credentials-play-services-auth:1.3.0`) + Google ID token library (`googleid:1.1.1`) — no deprecated GoogleSignInClient
+- [x] `GoogleCredentialManager` requests a Google ID token using `R.string.default_web_client_id`; handles success, user cancellation, no-credential, and provider errors
+- [x] `GoogleSignInPolicy` (pure, unit tested) decides: link anonymous session, plain sign-in, or refuse when already signed in with Google
+- [x] `FirebaseAuthRepository.signInWithGoogle(idToken)` uses `GoogleAuthProvider.getCredential(idToken, null)`; anonymous sessions are linked via `linkWithCredential` so the user id is preserved
+- [x] Collision fallback: if the Google account already exists, sign in to it; the anonymous account is never deleted and the Room database is untouched
+- [x] `AuthState.SignedIn` now carries `email` and `isAnonymous`; Settings shows email/anonymous mode with sign-out
+- [x] Settings UI: Google button, "Continue anonymously", link confirmation dialog, loading/success/cancel/error messages
+- [x] `assembleDebug` and `testDebugUnitTest` pass (7 unit tests: NoteModelTest 3, GoogleSignInPolicyTest 4)
+
+### Pending
+- [ ] Enable the Google provider in Firebase Console → Authentication → Sign-in method (Anonymous stays enabled)
+- [ ] On-device verification of the full flow (picker, Firebase exchange, link/conflict paths)
