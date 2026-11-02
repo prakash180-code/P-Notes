@@ -88,5 +88,12 @@ Firebase is configured: `app/google-services.json` is present (project `p-notes-
 - [x] `assembleDebug` and `testDebugUnitTest` pass (7 unit tests: NoteModelTest 3, GoogleSignInPolicyTest 4)
 
 ### Pending
-- [ ] Enable the Google provider in Firebase Console → Authentication → Sign-in method (Anonymous stays enabled)
-- [ ] On-device verification of the full flow (picker, Firebase exchange, link/conflict paths)
+- [ ] Runtime verification of the successful sign-in path when Play services is fixed on the test device
+- [ ] Anonymous Auth must stay enabled in the Firebase Console for "Continue anonymously"
+
+### On-device findings (moto g32 - 13, GMS 26.42.31)
+- Settings renders the new Account card: Google button, "Continue anonymously", cancelled-state message
+- Tapping "Sign in with Google" starts Credential Manager correctly
+- The Google account sheet crashes inside `com.google.android.gms.ui` (`AssistedSignInActivity`, `Bitmap.createBitmap` zero-size) before it opens — a Play services bug on this build, even after cache trim and reboot
+- P-Notes recovers gracefully: loading resets, "Google sign-in cancelled." is shown, no app crash, notes and widget intact
+- Full end-to-end sign-in (token exchange, link/conflict handling) is therefore build-verified and unit-verified, but not yet user-visible on this device
